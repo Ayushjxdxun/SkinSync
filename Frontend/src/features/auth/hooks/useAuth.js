@@ -1,44 +1,58 @@
-import { useContext } from "react";
+import { useContext,useEffect } from "react";
 import { AuthContext } from "../auth.context";
-import { login, register,logout, getMe } from "../services/auth.api";
+import { login, register, logout, getMe } from "../services/auth.api";
+
 export const useAuth = () => {
-    const context = useContext(AuthContext)
-    const { user, setUser, loading, setLoading } = context
+    const context = useContext(AuthContext);
+    const { user, setUser, loading, setLoading } = context;
 
-    const handleLogin = async ({email, password}) => {
-        setLoading(true)
+    const handleLogin = async ({ email, password }) => {
+        setLoading(true);
         try {
-            const data = await login({email, password})
-            setUser(data.user)
+            const data = await login({ email, password });
+            setUser(data.user);
         } catch (error) {
-            console.error("Error logging in user:", error)
+            console.error("Error logging in user:", error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
-    const handleRegister = async ({email, password, name}) => {
-        setLoading(true)
+    const handleRegister = async ({ email, password, username }) => {
+        setLoading(true);
         try {
-            const data = await register({email, password, name})
-            setUser(data.user)
+            const data = await register({ email, password, username });
+            setUser(data.user);
         } catch (error) {
-            console.error("Error registering user:", error)
+            console.error("Error registering user:", error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     const handleLogout = async () => {
-        setLoading(true)
+        setLoading(true);
         try {
-            await logout()
-            setUser(null)
+            await logout();
+            setUser(null);
         } catch (error) {
-            console.error("Error logging out user:", error)
+            console.error("Error logging out user:", error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
-    return { user, setUser, loading, setLoading, handleLogin, handleRegister, handleLogout }
-}
+
+    };
+
+useEffect(() => {
+        const getAndSetUser = async () => {
+            
+                const data = await getMe()
+                setUser(data.user)
+                setLoading(false)
+        }
+        getAndSetUser()
+    }, [])
+
+    // This return MUST be inside the function curly braces
+    return { user, setUser, loading, setLoading, handleLogin, handleRegister, handleLogout };
+}; // <--- Ensure this closing brace is at the very end
